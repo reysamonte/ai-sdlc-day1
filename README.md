@@ -12,6 +12,7 @@ own branch of this repository and is mounted here as a git submodule, so this
 | `backend`  | [backend/](./backend)  | Zero-dependency Bun server, in-memory Map storage        |
 | `frontend` | [frontend/](./frontend) | Angular 19 standalone app (dark, Lovable-inspired UI)     |
 | `cli`      | [cli/](./cli)      | Zero-dependency Node CLI (`snip add/ls/open`)             |
+| `bundle`   | [bundle/](./bundle)   | **Generated** deployable output (backend + built UI + CLI) — never hand-edit, regenerate via `scripts/build-bundle.mjs` |
 | `main`     | *(this branch)* | Aggregator: submodule pointers + this README         |
 
 Each submodule is this same GitHub repo, checked out on its own branch
@@ -107,3 +108,23 @@ change:
 Repeat step 2 for `frontend` or `cli` as needed. The superproject commit only
 ever changes by a single line per submodule (the pointer/SHA it tracks) — the
 actual code changes live in the submodule's own branch history.
+
+## Generated bundle branch
+
+The `bundle` branch/submodule is **entirely generated output** — a single
+deployable folder combining `backend/server.js`, the built frontend
+(`frontend/dist/snip-frontend/browser` copied to `bundle/public`), and
+`cli/cli.js`, plus a `.env` (`PUBLIC_DIR=./public`, auto-loaded by Bun so the
+server also serves the UI), `package.json`, `Dockerfile`, `.dockerignore`, and
+`railway.json` (Dockerfile builder). Never hand-edit files in `bundle/`.
+
+Regenerate it with:
+
+```sh
+node scripts/build-bundle.mjs           # build + commit locally, no push
+node scripts/build-bundle.mjs --push    # also push bundle and main
+```
+
+The script updates `backend`/`frontend`/`cli` to their branch tips, builds the
+frontend, assembles `bundle/`, and is safe to re-run — each commit step is a
+no-op when nothing changed.
