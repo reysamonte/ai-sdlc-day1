@@ -1,0 +1,9 @@
+{
+  "name": "snip-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Snip backend — a tiny URL shortener API server (zero npm dependencies, Bun + in-memory Map storage).",
+  "scripts": {
+    "start": "bun run server.js"
+  }
+}
